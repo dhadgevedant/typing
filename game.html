@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typing Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+  }
+  .container {
+    width: 80%;
+    max-width: 600px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: left;
+  }
+  pre {
+    white-space: pre-wrap;
+    font-size: 1.2em;
+  }
+  #input {
+    font-size: 1.2em;
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+  .progress-bar {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress {
+    width: 0%;
+    height: 20px;
+    background-color: #4CAF50;
+    transition: width 0.3s ease-in-out;
+  }
+  #score {
+    margin-top: 20px;
+    font-size: 1.5em;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>Typing Game</h2>
+    <pre id="paragraph">Type the following words:</pre>
+    <pre id="highlighted"></pre>
+    <p id="typed">Typed so far:</p>
+    <input type="text" id="input" autocomplete="off">
+    <div class="progress-bar">
+      <div id="progress" class="progress"></div>
+    </div>
+    <div id="score"></div>
+  </div>
+
+  <script>
+    const words = [
+      "apple", "banana", "orange", "grape", "kiwi", 
+      "lemon", "mango", "peach", "pear", "plum"
+    ];
+
+    let paragraph = "";
+    let correctWords = 0;
+    let currentWordIndex = 0;
+    let currentInput = "";
+    let typedWords = "";
+    const inputField = document.getElementById('input');
+    const paragraphElement = document.getElementById('paragraph');
+    const highlightedElement = document.getElementById('highlighted');
+    const typedElement = document.getElementById('typed');
+    const progressBar = document.getElementById('progress');
+    const scoreElement = document.getElementById('score');
+
+    function getRandomWords(num) {
+      const shuffledWords = words.sort(() => 0.5 - Math.random());
+      return shuffledWords.slice(0, num).join(" ");
+    }
+
+    function startGame() {
+      paragraph = getRandomWords(7 + Math.floor(Math.random() * 4));
+      displayParagraph();
+
+      inputField.focus();
+
+      inputField.addEventListener('input', handleInput);
+      inputField.addEventListener('keydown', handleKeyDown);
+    }
+
+    function handleInput() {
+      currentInput = inputField.value.trim();
+      displayParagraph();
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === ' ') {
+        event.preventDefault();
+        checkWord();
+        inputField.value = "";
+        currentWordIndex++;
+        displayParagraph();
+      }
+    }
+
+    function checkWord() {
+      const wordList = paragraph.split(" ");
+      typedWords += currentInput + " ";
+      if (currentInput === wordList[currentWordIndex]) {
+        correctWords++;
+        updateProgressBar();
+      }
+
+      if (currentWordIndex >= wordList.length - 1) {
+        showScore();
+      }
+    }
+
+    function updateProgressBar() {
+      const totalWords = paragraph.split(" ").length;
+      const progressPercent = (correctWords / totalWords) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+    }
+
+    function displayParagraph() {
+      const wordList = paragraph.split(" ");
+      wordList[currentWordIndex] = `<strong>${wordList[currentWordIndex]}</strong>`;
+      paragraphElement.textContent = "Type the following words:";
+      highlightedElement.innerHTML = wordList.join(" ");
+      typedElement.textContent = "Typed so far: " + typedWords;
+    }
+
+    function showScore() {
+      scoreElement.textContent = `Game over! You typed ${correctWords} words correctly.`;
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
